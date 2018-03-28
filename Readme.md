@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Дмитрий Горянин](https://up.htmlacademy.ru/javascript/13/user/497391).
-* Наставник: Александр Собакар ( https://htmlacademy.ru/profile/id128451 ).
+* Наставник: Александр Собакарь ( https://htmlacademy.ru/profile/id128451 ).
 
 ---
 
