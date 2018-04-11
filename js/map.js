@@ -101,9 +101,9 @@ var generateCardObjects = function (amount) {
 var makePinElement = function (house) {
   var pin = pinTemplate.cloneNode(true);
   pin.style = 'left: '
-    + (house.location.x + 25)
+    + (house.location.x - 25)
     + 'px; top: '
-    + (house.location.y + 70)
+    + (house.location.y - 70)
     + 'px;';
   pin.querySelector('img').src = house.author.avatar;
   pin.querySelector('img').alt = house.offer.title;
