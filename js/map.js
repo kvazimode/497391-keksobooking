@@ -19,16 +19,14 @@ var PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
-var currentShuffledTitlesIndex = 0;
-var currentShuffledAvatarsIndex = 0;
+
 var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
 var pinsNode = document.querySelector('.map__pins');
 var cardTemplate = template.querySelector('.map__card');
 var mapNode = document.querySelector('.map');
 var filterNode = document.querySelector('.map__filters-container');
-
-document.querySelector('.map').classList.remove('map--faded');
+mapNode.classList.remove('map--faded');
 
 var getRandomInt = function (min, max) {
   var random = min - 0.5 + Math.random() * (max - min + 1);
@@ -36,8 +34,7 @@ var getRandomInt = function (min, max) {
 };
 
 var getRandomParam = function (params) {
-  var param = params[getRandomInt(0, params.length - 1)];
-  return param;
+  return params[getRandomInt(0, params.length - 1)];
 };
 
 var generateShuffledArray = function (array) {
@@ -50,29 +47,12 @@ var generateShuffledArray = function (array) {
   return array;
 };
 
-var shuffledTitles = generateShuffledArray(TITLES);
-
-var pickTitle = function (titles) {
-  var title = titles[currentShuffledTitlesIndex];
-  currentShuffledTitlesIndex++;
-  return title;
-};
-
 var generateShuffledIntArray = function (amount) {
   var shuffled = [];
   for (var i = 1; i <= amount; i++) {
     shuffled.push(i);
   }
-  shuffled = generateShuffledArray(shuffled);
-  return shuffled;
-};
-
-var shuffledAvatarNumbers = generateShuffledIntArray(8);
-
-var pickAvatarNumber = function (avatars) {
-  var avatar = avatars[currentShuffledAvatarsIndex];
-  currentShuffledAvatarsIndex++;
-  return avatar;
+  return generateShuffledArray(shuffled);
 };
 
 var getAvatarLink = function (imgNumber) {
@@ -89,6 +69,9 @@ var getFeatures = function (featuresList) {
   return features;
 };
 
+var shuffledTitles = generateShuffledArray(TITLES);
+var shuffledAvatarNumbers = generateShuffledIntArray(8);
+
 var generateCardObjects = function (amount) {
   var cards = [];
   for (var i = 0; i < amount; i++) {
@@ -96,13 +79,11 @@ var generateCardObjects = function (amount) {
     card.author = {};
     card.offer = {};
     card.location = {};
-    card.author.avatar = getAvatarLink(pickAvatarNumber(shuffledAvatarNumbers));
-    card.offer.title = pickTitle(shuffledTitles);
+    card.author.avatar = getAvatarLink(shuffledAvatarNumbers[i]);
+    card.offer.title = shuffledTitles[i];
     card.location.x = getRandomInt(300, 900);
     card.location.y = getRandomInt(150, 500);
-    card.offer.address = card.location.x.toString()
-      + ', '
-      + card.location.y.toString();
+    card.offer.address = card.location.x + ', ' + card.location.y;
     card.offer.price = getRandomInt(1000, 1000000);
     card.offer.type = getRandomParam(TYPES);
     card.offer.rooms = getRandomInt(1, 5);
@@ -120,9 +101,9 @@ var generateCardObjects = function (amount) {
 var makePinElement = function (element) {
   var pin = pinTemplate.cloneNode(true);
   pin.style = 'left: '
-    + (element.location.x + 40)
+    + (element.location.x + 50)
     + 'px; top: '
-    + (element.location.y + 40)
+    + (element.location.y + 70)
     + 'px;';
   pin.querySelector('img').src = element.author.avatar;
   pin.querySelector('img').alt = element.offer.title;
@@ -178,6 +159,7 @@ var setCardTime = function (cardNode, element) {
     + element.offer.checkout;
 };
 
+// запоминаем первый элемент списка, удаляем список, создаём клоны первого элемента с нужыми классами
 var setCardFeatures = function (cardNode, element) {
   var featuresNode = cardNode.querySelector('.popup__features');
   var featuresList = featuresNode.querySelectorAll('li');
@@ -199,10 +181,11 @@ var setCardDescription = function (cardNode, element) {
 
 var setCardPhotos = function (cardNode, element) {
   var photosNode = cardNode.querySelector('.popup__photos');
+  var firstImg = photosNode.querySelector('img');
+  photosNode.removeChild(firstImg);
   for (var i = 0; i < element.offer.photos.length; i++) {
-    var photoSource = element.offer.photos[i];
-    var photo = photosNode.querySelector('img').cloneNode(false);
-    photo.src = photoSource;
+    var photo = firstImg.cloneNode(false);
+    photo.src = element.offer.photos[i];
     photosNode.appendChild(photo);
   }
 };
@@ -231,6 +214,5 @@ var appendCardElement = function (card) {
 };
 
 var cardObjects = generateCardObjects(8);
-
 appendMapPins(cardObjects);
 appendCardElement(cardObjects[0]);
