@@ -12,6 +12,12 @@ var TITLES = [
   'Неуютное бунгало по колено в воде'
 ];
 var TYPES = ['palace', 'flat', 'house', 'bungalo'];
+var TYPES_DICT = {
+  palace: 'Дворец',
+  house: 'Дом',
+  bungalo: 'Бунгало',
+  flat: 'Квартира'
+};
 var CHECKINS_CHEKOUTS = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
 var PHOTOS = [
@@ -73,7 +79,7 @@ var shuffledTitles = generateShuffledArray(TITLES);
 var shuffledAvatarNumbers = generateShuffledIntArray(8);
 
 var generateCardObjects = function (amount) {
-  var cards = [];
+  var cardList = [];
   for (var i = 0; i < amount; i++) {
     var card = {};
     card.author = {};
@@ -93,124 +99,106 @@ var generateCardObjects = function (amount) {
     card.offer.features = getFeatures(FEATURES);
     card.offer.description = '';
     card.offer.photos = generateShuffledArray(PHOTOS);
-    cards.push(card);
+    cardList.push(card);
   }
-  return cards;
+  return cardList;
 };
 
-var makePinElement = function (house) {
+var makePinElement = function (item) {
   var pin = pinTemplate.cloneNode(true);
   pin.style = 'left: '
-    + (house.location.x - 25)
+    + (item.location.x - 25)
     + 'px; top: '
-    + (house.location.y - 70)
+    + (item.location.y - 70)
     + 'px;';
-  pin.querySelector('img').src = house.author.avatar;
-  pin.querySelector('img').alt = house.offer.title;
+  pin.querySelector('img').src = item.author.avatar;
+  pin.querySelector('img').alt = item.offer.title;
   return pin;
 };
 
-var appendMapPins = function (houses) {
-  for (var i = 0; i < houses.length; i++) {
-    pinsNode.appendChild(makePinElement(houses[i]));
+var appendMapPins = function (itemList) {
+  for (var i = 0; i < itemList.length; i++) {
+    pinsNode.appendChild(makePinElement(itemList[i]));
   }
 };
 
-var setCardTitle = function (cardNode, house) {
-  cardNode.querySelector('.popup__title').textContent = house.offer.title;
+var setCardTitle = function (cardNode, item) {
+  cardNode.querySelector('.popup__title').textContent = item.offer.title;
 };
 
-var setCardAddress = function (cardNode, house) {
-  cardNode.querySelector('.popup__text--address').textContent = house.offer.address;
+var setCardAddress = function (cardNode, item) {
+  cardNode.querySelector('.popup__text--address').textContent = item.offer.address;
 };
 
-var setCardPrice = function (cardNode, house) {
-  cardNode.querySelector('.popup__text--price').textContent = house.offer.price + '₽/ночь';
+var setCardPrice = function (cardNode, item) {
+  cardNode.querySelector('.popup__text--price').textContent = item.offer.price + '₽/ночь';
 };
 
-var setCardType = function (cardNode, house) {
-  switch (house.offer.type) {
-    case 'flat':
-      cardNode.querySelector('.popup__type').textContent = 'Квартира';
-      break;
-    case 'bungalo':
-      cardNode.querySelector('.popup__type').textContent = 'Бунгало';
-      break;
-    case 'house':
-      cardNode.querySelector('.popup__type').textContent = 'Дом';
-      break;
-    case 'palace':
-      cardNode.querySelector('.popup__type').textContent = 'Дворец';
-      break;
-  }
+var setCardType = function (cardNode, item) {
+  cardNode.querySelector('.popup__type').textContent = TYPES_DICT[item.offer.type];
 };
 
-var setCardCapacity = function (cardNode, house) {
-  cardNode.querySelector('.popup__text--capacity').textContent = house.offer.rooms
+var setCardCapacity = function (cardNode, item) {
+  cardNode.querySelector('.popup__text--capacity').textContent = item.offer.rooms
     + ' комнаты для '
-    + house.offer.guests
+    + item.offer.guests
     + ' гостей';
 };
 
-var setCardTime = function (cardNode, house) {
+var setCardTime = function (cardNode, item) {
   cardNode.querySelector('.popup__text--time').textContent = 'Заезд после '
-    + house.offer.checkin
+    + item.offer.checkin
     + ', выезд до '
-    + house.offer.checkout;
+    + item.offer.checkout;
 };
 
-// запоминаем первый элемент списка, удаляем список, создаём клоны первого элемента с нужыми классами
-var setCardFeatures = function (cardNode, house) {
+var setCardFeatures = function (cardNode, item) {
   var featuresNode = cardNode.querySelector('.popup__features');
-  var featuresList = featuresNode.querySelectorAll('li');
-  var listItem = featuresList[0];
-  for (var i = 0; i < featuresList.length; i++) {
-    featuresNode.removeChild(featuresList[i]);
+  var featureTemplate = featuresNode.firstElementChild;
+  for (var i = 0; i < item.offer.features.length; i++) {
+    var feature = featureTemplate.cloneNode(false);
+    feature.classList.add('popup__feature--' + item.offer.features[i]);
+    featuresNode.appendChild(feature);
   }
-  for (var j = 0; j < house.offer.features.length; j++) {
-    var newItem = listItem.cloneNode(false);
-    newItem.classList.remove('popup__feature--wifi');
-    newItem.classList.add('popup__feature--' + house.offer.features[j]);
-    featuresNode.appendChild(newItem);
-  }
+  featureTemplate.remove();
 };
 
-var setCardDescription = function (cardNode, house) {
-  cardNode.querySelector('.popup__description').textContent = house.offer.description;
+var setCardDescription = function (cardNode, item) {
+  cardNode.querySelector('.popup__description').textContent = item.offer.description;
 };
 
-var setCardPhotos = function (cardNode, house) {
+var setCardPhotos = function (cardNode, item) {
   var photosNode = cardNode.querySelector('.popup__photos');
-  var firstImg = photosNode.querySelector('img');
-  photosNode.removeChild(firstImg);
-  for (var i = 0; i < house.offer.photos.length; i++) {
-    var photo = firstImg.cloneNode(false);
-    photo.src = house.offer.photos[i];
+  var photoTemplate = photosNode.firstElementChild;
+  for (var i = 0; i < item.offer.photos.length; i++) {
+    var photo = photoTemplate.cloneNode(false);
+    photo.src = item.offer.photos[i];
     photosNode.appendChild(photo);
   }
+  photoTemplate.remove();
 };
 
-var setCardAvatar = function (cardNode, house) {
-  cardNode.querySelector('img').src = house.author.avatar;
+var setCardAvatar = function (cardNode, item) {
+  cardNode.querySelector('img').src = item.author.avatar;
 };
 
-var makeCardElement = function (house) {
+var makeCardElement = function (item) {
   var cardElement = cardTemplate.cloneNode(true);
-  setCardTitle(cardElement, house);
-  setCardAddress(cardElement, house);
-  setCardPrice(cardElement, house);
-  setCardType(cardElement, house);
-  setCardCapacity(cardElement, house);
-  setCardTime(cardElement, house);
-  setCardFeatures(cardElement, house);
-  setCardDescription(cardElement, house);
-  setCardPhotos(cardElement, house);
-  setCardAvatar(cardElement, house);
+  setCardTitle(cardElement, item);
+  setCardAddress(cardElement, item);
+  setCardPrice(cardElement, item);
+  setCardType(cardElement, item);
+  setCardCapacity(cardElement, item);
+  setCardTime(cardElement, item);
+  setCardFeatures(cardElement, item);
+  setCardDescription(cardElement, item);
+  setCardPhotos(cardElement, item);
+  setCardAvatar(cardElement, item);
   return cardElement;
 };
 
-var appendCardElement = function (house) {
-  mapNode.insertBefore(makeCardElement(house), filterNode);
+var appendCardElement = function (item) {
+  mapNode.insertBefore(makeCardElement(item), filterNode);
 };
 
 var cardObjects = generateCardObjects(8);
