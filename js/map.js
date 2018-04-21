@@ -25,14 +25,19 @@ var PHOTOS = [
   'http://o0.github.io/assets/images/tokyo/hotel2.jpg',
   'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
 ];
+var MAIN_PIN_HEIGHT = 84;
+var MAIN_PIN_WIDTH = 62;
 
 var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
 var pinsNode = document.querySelector('.map__pins');
 var cardTemplate = template.querySelector('.map__card');
+var form = document.querySelector('.ad-form');
+var formFieldList = form.querySelectorAll('fieldset');
+var formFieldAddress = form.querySelector('#address');
+var pinMain = document.querySelector('.map__pin--main');
 var mapNode = document.querySelector('.map');
 var filterNode = document.querySelector('.map__filters-container');
-mapNode.classList.remove('map--faded');
 
 var getRandomInt = function (min, max) {
   var random = min - 0.5 + Math.random() * (max - min + 1);
@@ -43,6 +48,57 @@ var getRandomParam = function (params) {
   return params[getRandomInt(0, params.length - 1)];
 };
 
+// переключение активности полей формы
+var setFormActive = function (active) {
+  for (var i = 0; i < formFieldList.length; i++) {
+    formFieldList[i].disabled = !active;
+  }
+  if (!active) {
+    form.classList.add('ad-form--disabled');
+  } else {
+    form.classList.remove('ad-form--disabled');
+  }
+};
+setFormActive(false);
+
+// передача координаты главной метки в поле адреса
+var writePinAddress = function () {
+  var left = parseInt(pinMain.style.left, 10);
+  var top = parseInt(pinMain.style.top, 10);
+  formFieldAddress.value = (left + MAIN_PIN_WIDTH / 2) + ', ' + (top + MAIN_PIN_HEIGHT);
+};
+writePinAddress();
+
+// активация страницы
+pinMain.addEventListener('mouseup', function () {
+  mapNode.classList.remove('map--faded');
+  appendMapPins(cardObjectList);
+  setFormActive(true);
+});
+
+// отображение карточки по нажатию
+var findCard = function (alt) {
+  var card = {};
+  for (var i = 0; i < cardObjectList.length; i++) {
+    if (cardObjectList[i].offer.title === alt) {
+      card = cardObjectList[i];
+    }
+  }
+  return card;
+};
+
+var pinClickHandler = function (evt) {
+  var clickedPin = evt.currentTarget;
+  var pinAlt = clickedPin.firstElementChild.alt;
+  var card = findCard(pinAlt);
+  var cardPopup = mapNode.querySelector('.popup');
+  if (cardPopup) {
+    cardPopup.remove();
+  }
+  appendCardElement(card);
+};
+
+// создание пинов и карточки
 var generateShuffledArray = function (arr) {
   for (var i = arr.length - 1; i > 0; i--) {
     var j = Math.floor(Math.random() * (i + 1));
@@ -78,7 +134,7 @@ var getFeatures = function (featuresList) {
 var shuffledTitles = generateShuffledArray(TITLES);
 var shuffledAvatarNumbers = generateShuffledIntArray(8);
 
-var generateCardObjects = function (amount) {
+var generateCardObjectList = function (amount) {
   var cardList = [];
   for (var i = 0; i < amount; i++) {
     var card = {};
@@ -103,6 +159,7 @@ var generateCardObjects = function (amount) {
   }
   return cardList;
 };
+var cardObjectList = generateCardObjectList(8);
 
 var makePinElement = function (item) {
   var pin = pinTemplate.cloneNode(true);
@@ -113,6 +170,7 @@ var makePinElement = function (item) {
     + 'px;';
   pin.querySelector('img').src = item.author.avatar;
   pin.querySelector('img').alt = item.offer.title;
+  pin.addEventListener('click', pinClickHandler, true);
   return pin;
 };
 
@@ -200,7 +258,3 @@ var makeCardElement = function (item) {
 var appendCardElement = function (item) {
   mapNode.insertBefore(makeCardElement(item), filterNode);
 };
-
-var cardObjects = generateCardObjects(8);
-appendMapPins(cardObjects);
-appendCardElement(cardObjects[0]);
