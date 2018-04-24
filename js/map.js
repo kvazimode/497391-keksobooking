@@ -12,11 +12,23 @@ var TITLES = [
   'Неуютное бунгало по колено в воде'
 ];
 var TYPES = ['palace', 'flat', 'house', 'bungalo'];
-var TYPES_DICT = {
-  palace: 'Дворец',
-  house: 'Дом',
-  bungalo: 'Бунгало',
-  flat: 'Квартира'
+var TYPES_PARAM = {
+  bungalo: {
+    title: 'Бунгало',
+    minPrice: 0
+  },
+  flat: {
+    title: 'Квартира',
+    minPrice: 1000
+  },
+  house: {
+    title: 'Дом',
+    minPrice: 5000
+  },
+  palace: {
+    title: 'Дворец',
+    minPrice: 10000
+  }
 };
 var CHECKINS_CHEKOUTS = ['12:00', '13:00', '14:00'];
 var FEATURES = ['wifi', 'dishwasher', 'parking', 'washer', 'elevator', 'conditioner'];
@@ -32,9 +44,16 @@ var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
 var pinsNode = document.querySelector('.map__pins');
 var cardTemplate = template.querySelector('.map__card');
-var form = document.querySelector('.ad-form');
-var formFieldList = form.querySelectorAll('fieldset');
-var formFieldAddress = form.querySelector('#address');
+var formNode = document.querySelector('.ad-form');
+var formFieldList = formNode.querySelectorAll('fieldset');
+var formFieldAddress = formNode.querySelector('#address');
+var formFieldCheckIn = formNode.querySelector('#timein');
+var formFieldCheckOut = formNode.querySelector('#timeout');
+var formFieldPrice = formNode.querySelector('#price');
+var formFieldType = formNode.querySelector('#type');
+var formFieldCapacity = formNode.querySelector('#capacity');
+var formFieldRoomNumber = formNode.querySelector('#room_number');
+var formSubmitButton = formNode.querySelector('.ad-form__submit');
 var pinMain = document.querySelector('.map__pin--main');
 var mapNode = document.querySelector('.map');
 var filterNode = document.querySelector('.map__filters-container');
@@ -54,9 +73,9 @@ var setFormActive = function (active) {
     formFieldList[i].disabled = !active;
   }
   if (!active) {
-    form.classList.add('ad-form--disabled');
+    formNode.classList.add('ad-form--disabled');
   } else {
-    form.classList.remove('ad-form--disabled');
+    formNode.classList.remove('ad-form--disabled');
   }
 };
 setFormActive(false);
@@ -97,6 +116,54 @@ var pinClickHandler = function (evt) {
   }
   appendCardElement(card);
 };
+
+// синхронизация времени заезда/выезда
+var setTimeInOut = function (time, node) {
+  if (node === formFieldCheckIn) {
+    formFieldCheckIn.value = time;
+  } else {
+    formFieldCheckOut.value = time;
+  }
+};
+
+formFieldCheckIn.addEventListener('change', function () {
+  setTimeInOut(formFieldCheckIn.value, formFieldCheckOut);
+});
+
+formFieldCheckOut.addEventListener('change', function () {
+  setTimeInOut(formFieldCheckOut.value, formFieldCheckIn);
+});
+
+// установка минимальной цены от типа жилья
+var setMinPrice = function (room) {
+  var minimum = TYPES_PARAM[room].minPrice;
+  formFieldPrice.placeholder = minimum;
+  formFieldPrice.min = minimum;
+};
+setMinPrice(formFieldType.value);
+
+formFieldType.addEventListener('change', function () {
+  setMinPrice(formFieldType.value);
+});
+
+// проверка на соотвествие количества гостей и комнат
+var checkCapacity = function (room, guest) {
+  room = parseInt(room, 10);
+  guest = parseInt(guest, 10);
+  if (room === 100 && guest !== 0) {
+    formFieldCapacity.setCustomValidity('Гости не допускаются');
+  } else if (room !== 100 && guest === 0) {
+    formFieldCapacity.setCustomValidity('Без гостей можно только при 100 комнат');
+  } else if (guest <= room) {
+    formFieldCapacity.setCustomValidity('');
+  } else {
+    formFieldCapacity.setCustomValidity('Количество гостей не может быть больше количества комнат');
+  }
+};
+
+formSubmitButton.addEventListener('click', function () {
+  checkCapacity(formFieldRoomNumber.value, formFieldCapacity.value);
+});
 
 // создание пинов и карточки
 var generateShuffledArray = function (arr) {
@@ -193,7 +260,7 @@ var setCardPrice = function (cardNode, item) {
 };
 
 var setCardType = function (cardNode, item) {
-  cardNode.querySelector('.popup__type').textContent = TYPES_DICT[item.offer.type];
+  cardNode.querySelector('.popup__type').textContent = TYPES_PARAM[item.offer.type].title;
 };
 
 var setCardCapacity = function (cardNode, item) {
