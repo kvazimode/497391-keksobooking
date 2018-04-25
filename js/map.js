@@ -118,7 +118,7 @@ var pinClickHandler = function (evt) {
 };
 
 // синхронизация времени заезда/выезда
-var setTimeInOut = function (time, node) {
+var syncArrivalDepartureTime = function (time, node) {
   if (node === formFieldCheckIn) {
     formFieldCheckIn.value = time;
   } else {
@@ -127,23 +127,23 @@ var setTimeInOut = function (time, node) {
 };
 
 formFieldCheckIn.addEventListener('change', function () {
-  setTimeInOut(formFieldCheckIn.value, formFieldCheckOut);
+  syncArrivalDepartureTime(formFieldCheckIn.value, formFieldCheckOut);
 });
 
 formFieldCheckOut.addEventListener('change', function () {
-  setTimeInOut(formFieldCheckOut.value, formFieldCheckIn);
+  syncArrivalDepartureTime(formFieldCheckOut.value, formFieldCheckIn);
 });
 
 // установка минимальной цены от типа жилья
-var setMinPrice = function (room) {
+var setMinPriceLimit = function (room) {
   var minimum = TYPES_PARAM[room].minPrice;
   formFieldPrice.placeholder = minimum;
   formFieldPrice.min = minimum;
 };
-setMinPrice(formFieldType.value);
+setMinPriceLimit(formFieldType.value);
 
 formFieldType.addEventListener('change', function () {
-  setMinPrice(formFieldType.value);
+  setMinPriceLimit(formFieldType.value);
 });
 
 // проверка на соотвествие количества гостей и комнат
@@ -151,7 +151,7 @@ var checkCapacity = function (room, guest) {
   room = parseInt(room, 10);
   guest = parseInt(guest, 10);
   if (room === 100 && guest !== 0) {
-    formFieldCapacity.setCustomValidity('Гости не допускаются');
+    formFieldCapacity.setCustomValidity('При выбранном количестве комнат гости не допускаются');
   } else if (room !== 100 && guest === 0) {
     formFieldCapacity.setCustomValidity('Без гостей можно только при 100 комнат');
   } else if (guest <= room) {
