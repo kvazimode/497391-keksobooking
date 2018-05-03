@@ -39,6 +39,8 @@ var PHOTOS = [
 ];
 var MAIN_PIN_HEIGHT = 84;
 var MAIN_PIN_WIDTH = 62;
+var MAP_HEIGHT = 704;
+var MAP_WIDTH = 1200;
 
 var template = document.querySelector('template').content;
 var pinTemplate = template.querySelector('.map__pin');
@@ -57,6 +59,7 @@ var formSubmitButton = formNode.querySelector('.ad-form__submit');
 var pinMain = document.querySelector('.map__pin--main');
 var mapNode = document.querySelector('.map');
 var filterNode = document.querySelector('.map__filters-container');
+var firstPinMouseUp = true;
 
 var getRandomInt = function (min, max) {
   var random = min - 0.5 + Math.random() * (max - min + 1);
@@ -66,6 +69,50 @@ var getRandomInt = function (min, max) {
 var getRandomParam = function (params) {
   return params[getRandomInt(0, params.length - 1)];
 };
+
+// потаскивание главного пина
+pinMain.addEventListener('mousedown', function (evt) {
+  var startPoint = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var mouseMoveHandler = function (moveEvt) {
+    var distance = {
+      x: startPoint.x - moveEvt.clientX,
+      y: startPoint.y - moveEvt.clientY
+    };
+    startPoint = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    var newY = pinMain.offsetTop - distance.y;
+    var newX = pinMain.offsetLeft - distance.x;
+    if (newY < (MAP_HEIGHT - MAIN_PIN_HEIGHT) && newY > 0) {
+      pinMain.style.top = (newY) + 'px';
+    }
+    if (newX < (MAP_WIDTH - MAIN_PIN_WIDTH / 2) && newX > 0) {
+      pinMain.style.left = (newX) + 'px';
+    }
+  };
+
+  var mouseUpHandler = function () {
+    document.removeEventListener('mousemove', mouseMoveHandler);
+    document.removeEventListener('mouseup', mouseUpHandler);
+    writePinAddress();
+    if (firstPinMouseUp) {
+      mapNode.classList.remove('map--faded');
+      appendMapPins(cardObjectList);
+      setFormActive(true);
+      firstPinMouseUp = false;
+    }
+  };
+
+  document.addEventListener('mousemove', mouseMoveHandler);
+  document.addEventListener('mouseup', mouseUpHandler);
+
+});
 
 // переключение активности полей формы
 var setFormActive = function (active) {
@@ -87,13 +134,6 @@ var writePinAddress = function () {
   formFieldAddress.value = (left + MAIN_PIN_WIDTH / 2) + ', ' + (top + MAIN_PIN_HEIGHT);
 };
 writePinAddress();
-
-// активация страницы
-pinMain.addEventListener('mouseup', function () {
-  mapNode.classList.remove('map--faded');
-  appendMapPins(cardObjectList);
-  setFormActive(true);
-});
 
 // отображение карточки по нажатию
 var findCard = function (alt) {
