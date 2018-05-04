@@ -92,7 +92,7 @@ pinMain.addEventListener('mousedown', function (evt) {
     if (newY < (MAP_HEIGHT - MAIN_PIN_HEIGHT) && newY > 0) {
       pinMain.style.top = (newY) + 'px';
     }
-    if (newX < (MAP_WIDTH - MAIN_PIN_WIDTH / 2) && newX > 0) {
+    if (newX < (MAP_WIDTH - MAIN_PIN_WIDTH) && newX > 0) {
       pinMain.style.left = (newX) + 'px';
     }
   };
