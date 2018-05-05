@@ -9,6 +9,8 @@
   var formFieldCapacity = window.util.formNode.querySelector('#capacity');
   var formFieldRoomNumber = window.util.formNode.querySelector('#room_number');
   var formSubmitButton = window.util.formNode.querySelector('.ad-form__submit');
+  var formResetButton = window.util.formNode.querySelector('.ad-form__reset');
+  var successMessage = document.querySelector('.success');
 
   // переключение активности полей формы
   window.setFormActive = function (active) {
@@ -68,5 +70,46 @@
 
   formSubmitButton.addEventListener('click', function () {
     checkCapacity(formFieldRoomNumber.value, formFieldCapacity.value);
+  });
+
+  var removePins = function () {
+    var pin = window.util.pinMain.nextElementSibling;
+    while (pin) {
+      pin.remove();
+      pin = window.util.pinMain.nextElementSibling;
+    }
+  };
+
+  var pageReset = function () {
+    window.util.formNode.reset();
+    window.setFormActive(false);
+    window.mapNode.classList.add('map--faded');
+    removePins();
+    window.util.pinMain.style.top = '375px';
+    window.util.pinMain.style.left = '570px';
+    window.firstPinMouseUp = true;
+    window.cardPopup = window.mapNode.querySelector('.popup');
+    if (window.cardPopup) {
+      window.removePopupCard(window.cardPopup);
+    }
+  };
+
+  successMessage.addEventListener('click', function () {
+    successMessage.classList.add('hidden');
+  });
+
+  formResetButton.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    pageReset();
+  });
+
+  var formSuccessSentHandler = function () {
+    pageReset();
+    successMessage.classList.remove('hidden');
+  };
+
+  window.util.formNode.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.backend.upload('https://js.dump.academy/keksobooking', new FormData(evt.target), formSuccessSentHandler);
   });
 })();

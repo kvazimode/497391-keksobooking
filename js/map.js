@@ -3,16 +3,35 @@
 (function () {
   var MAIN_PIN_HEIGHT = 84;
   var MAIN_PIN_WIDTH = 62;
-  var MAP_HEIGHT = 704;
   var MAP_WIDTH = 1200;
 
   var formFieldAddress = window.util.formNode.querySelector('#address');
   var pinsNode = document.querySelector('.map__pins');
-  var mapNode = document.querySelector('.map');
+  window.mapNode = document.querySelector('.map');
   var filterNode = document.querySelector('.map__filters-container');
-  var firstPinMouseUp = true;
-  var cardObjectList = window.generateCardObjectList(8);
+  var errorTemplate = window.util.template.querySelector('.error');
+  window.firstPinMouseUp = true;
   window.setFormActive(false);
+
+  // отображение ошибки
+  var showError = function (err) {
+    var errorMessage = errorTemplate.cloneNode(true);
+    if (err) {
+      errorMessage.querySelector('p').textContent = err;
+    }
+    errorMessage.addEventListener('click', function () {
+      errorMessage.remove();
+    });
+    document.querySelector('main').appendChild(errorMessage);
+  };
+
+  // скачивание данных
+  var writeResponseData = function (res) {
+    cardObjectList = res;
+  };
+
+  var cardObjectList = null;
+  window.backend.load('https://js.dump.academy/keksobooking/data', writeResponseData, showError);
 
   // потаскивание главного пина
   window.util.pinMain.addEventListener('mousedown', function (evt) {
@@ -33,7 +52,7 @@
 
       var newY = window.util.pinMain.offsetTop - distance.y;
       var newX = window.util.pinMain.offsetLeft - distance.x;
-      if (newY < (MAP_HEIGHT - MAIN_PIN_HEIGHT) && newY > 0) {
+      if (newY < 500 + MAIN_PIN_HEIGHT && newY > 150) {
         window.util.pinMain.style.top = (newY) + 'px';
       }
       if (newX < (MAP_WIDTH - MAIN_PIN_WIDTH) && newX > 0) {
@@ -45,11 +64,11 @@
       document.removeEventListener('mousemove', mouseMoveHandler);
       document.removeEventListener('mouseup', mouseUpHandler);
       writePinAddress();
-      if (firstPinMouseUp) {
-        mapNode.classList.remove('map--faded');
+      if (window.firstPinMouseUp) {
+        window.mapNode.classList.remove('map--faded');
         appendMapPins(cardObjectList);
         window.setFormActive(true);
-        firstPinMouseUp = false;
+        window.firstPinMouseUp = false;
       }
     };
     document.addEventListener('mousemove', mouseMoveHandler);
@@ -79,9 +98,8 @@
     var clickedPin = evt.currentTarget;
     var pinAlt = clickedPin.firstElementChild.alt;
     var card = findCard(pinAlt);
-    var cardPopup = mapNode.querySelector('.popup');
-    if (cardPopup) {
-      window.removePopupCard(cardPopup);
+    if (window.cardPopup) {
+      window.removePopupCard(window.cardPopup);
     }
     appendCardElement(card);
   };
@@ -93,6 +111,7 @@
     }
   };
   var appendCardElement = function (item) {
-    mapNode.insertBefore(window.makeCardElement(item), filterNode);
+    window.mapNode.insertBefore(window.makeCardElement(item), filterNode);
   };
+
 })();
