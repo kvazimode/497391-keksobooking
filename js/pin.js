@@ -15,9 +15,8 @@
     var clickedPin = evt.currentTarget;
     var pinAlt = clickedPin.firstElementChild.alt;
     var card = findCard(pinAlt);
-    window.cardPopup = window.util.mapNode.querySelector('.popup');
-    if (window.cardPopup) {
-      window.cardPopup.remove();
+    if (window.util.cardPopup) {
+      window.util.cardPopup.remove();
     }
     window.appendCardElement(card);
   };

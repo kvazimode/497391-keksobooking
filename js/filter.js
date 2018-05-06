@@ -2,7 +2,7 @@
 
 
 (function () {
-  var DELAY = 3000;
+  var DELAY = 500;
   var filterState = {
     'housing-type': 'any',
     'housing-price': 'any',
@@ -73,10 +73,7 @@
           }
         }
       }
-      if (count === filter.length) {
-        return true;
-      }
-      return false;
+      return (count === filter.length);
     }
     return true;
   };
@@ -133,8 +130,8 @@
     }
     window.util.removePins();
     var List = findSuitable(window.data.serverData, filterState);
-    debounce(window.util.appendMapPins(List));
+    window.util.appendMapPins(List);
   };
 
-  window.util.filterNode.addEventListener('change', filterChangeHandler);
+  window.util.filterNode.addEventListener('change', debounce(filterChangeHandler));
 })();

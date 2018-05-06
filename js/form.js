@@ -67,9 +67,8 @@
     window.util.pinMain.style.top = '375px';
     window.util.pinMain.style.left = '570px';
     window.firstPinMouseUp = true;
-    window.cardPopup = window.util.mapNode.querySelector('.popup');
-    if (window.cardPopup) {
-      window.cardPopup.remove();
+    if (window.util.cardPopup) {
+      window.util.cardPopup.remove();
     }
     window.util.writePinAddress();
     window.resetFilter();

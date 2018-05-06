@@ -89,10 +89,10 @@
     }
   }
 
-  window.cardEscPressHandler = function (evt) {
+  var cardEscPressHandler = function (evt) {
     isEscPressEvent(evt, function () {
-      window.cardPopup.remove();
-      document.removeEventListener('keydown', window.cardEscPressHandler);
+      window.util.cardPopup.remove();
+      document.removeEventListener('keydown', cardEscPressHandler);
     });
   };
 
@@ -112,7 +112,7 @@
     closeButton.addEventListener('click', function () {
       cardElement.remove();
     });
-    cardElement.addEventListener('keydown', window.cardEscPressHandler);
+    document.addEventListener('keydown', cardEscPressHandler);
     return cardElement;
   };
 })();

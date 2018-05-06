@@ -13,6 +13,10 @@ window.util = (function () {
     formNode: formNode,
     formFieldList: formNode.querySelectorAll('fieldset'),
     formFieldAddress: formNode.querySelector('#address'),
+    cardPopup: null,
+    setCardPopup: function () {
+      window.util.cardPopup = window.util.mapNode.querySelector('.popup');
+    },
     getRandomInt: function (min, max) {
       var random = min - 0.5 + Math.random() * (max - min + 1);
       random = Math.round(random);

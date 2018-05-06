@@ -59,6 +59,7 @@
   };
   window.appendCardElement = function (item) {
     window.util.mapNode.insertBefore(window.makeCardElement(item), window.util.filterNode);
+    window.util.setCardPopup();
   };
 
 })();
