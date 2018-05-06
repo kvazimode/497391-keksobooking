@@ -38,17 +38,17 @@
   };
 
   var setCardCapacity = function (cardNode, item) {
-    cardNode.querySelector('.popup__text--capacity').textContent = item.offer.rooms
-      + ' комнаты для '
-      + item.offer.guests
-      + ' гостей';
+    cardNode.querySelector('.popup__text--capacity').textContent = item.offer.rooms +
+      ' комнаты для ' +
+      item.offer.guests +
+      ' гостей';
   };
 
   var setCardTime = function (cardNode, item) {
-    cardNode.querySelector('.popup__text--time').textContent = 'Заезд после '
-      + item.offer.checkin
-      + ', выезд до '
-      + item.offer.checkout;
+    cardNode.querySelector('.popup__text--time').textContent = 'Заезд после ' +
+      item.offer.checkin +
+      ', выезд до ' +
+      item.offer.checkout;
   };
 
   var setCardFeatures = function (cardNode, item) {
@@ -81,10 +81,6 @@
     cardNode.querySelector('img').src = item.author.avatar;
   };
 
-  window.removePopupCard = function (card) {
-    card.remove();
-  };
-
   window.makeCardElement = function (item) {
     var cardElement = cardTemplate.cloneNode(true);
     var closeButton = cardElement.querySelector('.popup__close');
@@ -99,7 +95,7 @@
     setCardPhotos(cardElement, item);
     setCardAvatar(cardElement, item);
     closeButton.addEventListener('click', function () {
-      window.removePopupCard(cardElement);
+      cardElement.remove();
     });
     return cardElement;
   };

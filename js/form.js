@@ -1,7 +1,6 @@
 'use strict';
 
 (function () {
-  var formFieldList = window.util.formNode.querySelectorAll('fieldset');
   var formFieldCheckIn = window.util.formNode.querySelector('#timein');
   var formFieldCheckOut = window.util.formNode.querySelector('#timeout');
   var formFieldPrice = window.util.formNode.querySelector('#price');
@@ -11,18 +10,6 @@
   var formSubmitButton = window.util.formNode.querySelector('.ad-form__submit');
   var formResetButton = window.util.formNode.querySelector('.ad-form__reset');
   var successMessage = document.querySelector('.success');
-
-  // переключение активности полей формы
-  window.setFormActive = function (active) {
-    for (var i = 0; i < formFieldList.length; i++) {
-      formFieldList[i].disabled = !active;
-    }
-    if (!active) {
-      window.util.formNode.classList.add('ad-form--disabled');
-    } else {
-      window.util.formNode.classList.remove('ad-form--disabled');
-    }
-  };
 
   // синхронизация времени заезда/выезда
   var syncArrivalDepartureTime = function (time, node) {
@@ -72,26 +59,20 @@
     checkCapacity(formFieldRoomNumber.value, formFieldCapacity.value);
   });
 
-  var removePins = function () {
-    var pin = window.util.pinMain.nextElementSibling;
-    while (pin) {
-      pin.remove();
-      pin = window.util.pinMain.nextElementSibling;
-    }
-  };
-
-  var pageReset = function () {
+  var resetPage = function () {
     window.util.formNode.reset();
-    window.setFormActive(false);
-    window.mapNode.classList.add('map--faded');
-    removePins();
+    window.util.setFormActive(false);
+    window.util.mapNode.classList.add('map--faded');
+    window.util.removePins();
     window.util.pinMain.style.top = '375px';
     window.util.pinMain.style.left = '570px';
     window.firstPinMouseUp = true;
-    window.cardPopup = window.mapNode.querySelector('.popup');
+    window.cardPopup = window.util.mapNode.querySelector('.popup');
     if (window.cardPopup) {
-      window.removePopupCard(window.cardPopup);
+      window.cardPopup.remove();
     }
+    window.util.writePinAddress();
+    window.resetFilter();
   };
 
   successMessage.addEventListener('click', function () {
@@ -100,11 +81,11 @@
 
   formResetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
-    pageReset();
+    resetPage();
   });
 
   var formSuccessSentHandler = function () {
-    pageReset();
+    resetPage();
     successMessage.classList.remove('hidden');
   };
 

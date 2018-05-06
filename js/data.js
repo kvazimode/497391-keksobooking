@@ -1,6 +1,7 @@
 'use strict';
 
 (function () {
+  var errorTemplate = window.util.template.querySelector('.error');
   var AVATARS_TEMPLATE = 'img/avatars/user0';
   var TITLES = [
     'Большая уютная квартира',
@@ -22,24 +23,6 @@
   var TYPES = ['palace', 'flat', 'house', 'bungalo'];
   var getRandomInt = window.util.getRandomInt;
   var getRandomParam = window.util.getRandomParam;
-  var generateShuffledArray = function (arr) {
-    for (var i = arr.length - 1; i > 0; i--) {
-      var j = Math.floor(Math.random() * (i + 1));
-      var tmp = arr[i];
-      arr[i] = arr[j];
-      arr[j] = tmp;
-    }
-    return arr;
-  };
-
-  var generateShuffledIntArray = function (amount) {
-    var shuffled = [];
-    for (var i = 1; i <= amount; i++) {
-      shuffled.push(i);
-    }
-    return generateShuffledArray(shuffled);
-  };
-
   var getAvatarLink = function (imgNumber) {
     return AVATARS_TEMPLATE + imgNumber + '.png';
   };
@@ -47,17 +30,17 @@
   var getFeatures = function (featuresList) {
     var amount = getRandomInt(0, featuresList.length - 1);
     var features = [];
-    var shuffled = generateShuffledArray(featuresList);
+    var shuffled = window.util.generateShuffledArray(featuresList);
     for (var i = 0; i <= amount; i++) {
       features.push(shuffled[i]);
     }
     return features;
   };
 
-  var shuffledTitles = generateShuffledArray(TITLES);
-  var shuffledAvatarNumbers = generateShuffledIntArray(8);
+  var shuffledTitles = window.util.generateShuffledArray(TITLES);
+  var shuffledAvatarNumbers = window.util.generateShuffledIntArray(8);
 
-  window.generateCardObjectList = function (amount) {
+  var generateCardObjectList = function (amount) {
     var cardList = [];
     for (var i = 0; i < amount; i++) {
       var card = {};
@@ -77,9 +60,29 @@
       card.offer.checkout = getRandomParam(CHECKINS_CHEKOUTS);
       card.offer.features = getFeatures(FEATURES);
       card.offer.description = '';
-      card.offer.photos = generateShuffledArray(PHOTOS);
+      card.offer.photos = window.util.generateShuffledArray(PHOTOS);
       cardList.push(card);
     }
     return cardList;
+  };
+  var showError = function (err) {
+    var errorMessage = errorTemplate.cloneNode(true);
+    if (err) {
+      errorMessage.querySelector('p').textContent = err;
+    }
+    errorMessage.addEventListener('click', function () {
+      errorMessage.remove();
+    });
+    document.querySelector('main').appendChild(errorMessage);
+  };
+
+  var writeResponseData = function (res) {
+    window.data.serverData = res;
+  };
+  window.backend.load('https://js.dump.academy/keksobooking/data', writeResponseData, showError);
+
+  window.data = {
+    generateData: generateCardObjectList,
+    serverData: null
   };
 })();
