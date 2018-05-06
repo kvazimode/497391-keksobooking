@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ESC_CODE = 27;
+
   window.TYPES_PARAM = {
     bungalo: {
       title: 'Бунгало',
@@ -38,17 +40,17 @@
   };
 
   var setCardCapacity = function (cardNode, item) {
-    cardNode.querySelector('.popup__text--capacity').textContent = item.offer.rooms
-      + ' комнаты для '
-      + item.offer.guests
-      + ' гостей';
+    cardNode.querySelector('.popup__text--capacity').textContent = item.offer.rooms +
+      ' комнаты для ' +
+      item.offer.guests +
+      ' гостей';
   };
 
   var setCardTime = function (cardNode, item) {
-    cardNode.querySelector('.popup__text--time').textContent = 'Заезд после '
-      + item.offer.checkin
-      + ', выезд до '
-      + item.offer.checkout;
+    cardNode.querySelector('.popup__text--time').textContent = 'Заезд после ' +
+      item.offer.checkin +
+      ', выезд до ' +
+      item.offer.checkout;
   };
 
   var setCardFeatures = function (cardNode, item) {
@@ -81,8 +83,17 @@
     cardNode.querySelector('img').src = item.author.avatar;
   };
 
-  window.removePopupCard = function (card) {
-    card.remove();
+  function isEscPressEvent(evt, callback) {
+    if (evt.keyCode === ESC_CODE) {
+      callback();
+    }
+  }
+
+  var cardEscPressHandler = function (evt) {
+    isEscPressEvent(evt, function () {
+      window.util.cardPopup.remove();
+      document.removeEventListener('keydown', cardEscPressHandler);
+    });
   };
 
   window.makeCardElement = function (item) {
@@ -99,8 +110,9 @@
     setCardPhotos(cardElement, item);
     setCardAvatar(cardElement, item);
     closeButton.addEventListener('click', function () {
-      window.removePopupCard(cardElement);
+      cardElement.remove();
     });
+    document.addEventListener('keydown', cardEscPressHandler);
     return cardElement;
   };
 })();
