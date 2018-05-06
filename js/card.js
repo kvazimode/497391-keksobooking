@@ -1,6 +1,8 @@
 'use strict';
 
 (function () {
+  var ESC_CODE = 27;
+
   window.TYPES_PARAM = {
     bungalo: {
       title: 'Бунгало',
@@ -81,6 +83,19 @@
     cardNode.querySelector('img').src = item.author.avatar;
   };
 
+  function isEscPressEvent(evt, callback) {
+    if (evt.keyCode === ESC_CODE) {
+      callback();
+    }
+  }
+
+  window.cardEscPressHandler = function (evt) {
+    isEscPressEvent(evt, function () {
+      window.cardPopup.remove();
+      document.removeEventListener('keydown', window.cardEscPressHandler);
+    });
+  };
+
   window.makeCardElement = function (item) {
     var cardElement = cardTemplate.cloneNode(true);
     var closeButton = cardElement.querySelector('.popup__close');
@@ -97,6 +112,7 @@
     closeButton.addEventListener('click', function () {
       cardElement.remove();
     });
+    cardElement.addEventListener('keydown', window.cardEscPressHandler);
     return cardElement;
   };
 })();

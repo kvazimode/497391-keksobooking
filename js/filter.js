@@ -2,6 +2,7 @@
 
 
 (function () {
+  var DELAY = 3000;
   var filterState = {
     'housing-type': 'any',
     'housing-price': 'any',
@@ -9,6 +10,7 @@
     'housing-guests': 'any',
     'features': []
   };
+
   window.resetFilter = function () {
     filterState.features = [];
     window.util.filterNode.querySelector('form').reset();
@@ -41,10 +43,7 @@
         given = +given;
         filter = +filter;
       }
-      if (given === filter) {
-        return true;
-      }
-      return false;
+      return (given === filter);
     }
     return true;
   };
@@ -54,20 +53,11 @@
     var high = 50000;
     if (filter !== 'any') {
       if (given < low) {
-        if (filter === 'low') {
-          return true;
-        }
-        return false;
+        return (filter === 'low');
       } else if (given >= low && given <= high) {
-        if (filter === 'middle') {
-          return true;
-        }
-        return false;
+        return (filter === 'middle');
       } else if (given > high) {
-        if (filter === 'high') {
-          return true;
-        }
-        return false;
+        return (filter === 'high');
       }
     }
     return true;
@@ -118,6 +108,19 @@
     return suitableItemList;
   };
 
+  function debounce(fn) {
+    var lastTimeout = null;
+    return function () {
+      var args = arguments;
+      if (lastTimeout) {
+        window.clearTimeout(lastTimeout);
+      }
+      lastTimeout = window.setTimeout(function () {
+        fn.apply(null, args);
+      }, DELAY);
+    };
+  }
+
   var filterChangeHandler = function (evt) {
     if (evt.target.name === 'features') {
       editFeature(evt.target);
@@ -129,7 +132,8 @@
       window.cardPopup.remove();
     }
     window.util.removePins();
-    window.appendMapPins(findSuitable(window.data.serverData, filterState));
+    var itemList = findSuitable(window.data.serverData, filterState);
+    debounce(window.appendMapPins(itemList));
   };
 
   window.util.filterNode.addEventListener('change', filterChangeHandler);
