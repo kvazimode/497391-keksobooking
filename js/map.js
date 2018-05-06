@@ -41,7 +41,7 @@
       window.util.writePinAddress();
       if (window.firstPinMouseUp) {
         window.util.mapNode.classList.remove('map--faded');
-        appendMapPins(window.data.serverData);
+        window.util.appendMapPins(window.data.serverData);
         window.util.setFormActive(true);
         window.firstPinMouseUp = false;
       }
@@ -51,12 +51,12 @@
   });
 
   // создание пинов и карточки
-  function appendMapPins(itemList) {
+  window.util.appendMapPins = function (itemList) {
     var arr = window.util.generateShuffledIntArray(itemList.length);
     for (var i = 0; i < 5 && i < itemList.length; i++) {
       pinsNode.appendChild(window.makePinElement(itemList[arr[i]]));
     }
-  }
+  };
   window.appendCardElement = function (item) {
     window.util.mapNode.insertBefore(window.makeCardElement(item), window.util.filterNode);
   };

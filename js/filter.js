@@ -108,7 +108,7 @@
     return suitableItemList;
   };
 
-  function debounce(fn) {
+  var debounce = function (fn) {
     var lastTimeout = null;
     return function () {
       var args = arguments;
@@ -119,7 +119,7 @@
         fn.apply(null, args);
       }, DELAY);
     };
-  }
+  };
 
   var filterChangeHandler = function (evt) {
     if (evt.target.name === 'features') {
@@ -132,8 +132,8 @@
       window.cardPopup.remove();
     }
     window.util.removePins();
-    var itemList = findSuitable(window.data.serverData, filterState);
-    debounce(window.appendMapPins(itemList));
+    var List = findSuitable(window.data.serverData, filterState);
+    debounce(window.util.appendMapPins(List));
   };
 
   window.util.filterNode.addEventListener('change', filterChangeHandler);
