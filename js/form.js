@@ -59,32 +59,17 @@
     checkCapacity(formFieldRoomNumber.value, formFieldCapacity.value);
   });
 
-  var resetPage = function () {
-    window.util.formNode.reset();
-    window.util.setFormActive(false);
-    window.util.mapNode.classList.add('map--faded');
-    window.util.removePins();
-    window.util.pinMain.style.top = '375px';
-    window.util.pinMain.style.left = '570px';
-    window.firstPinMouseUp = true;
-    if (window.util.cardPopup) {
-      window.util.cardPopup.remove();
-    }
-    window.util.writePinAddress();
-    window.resetFilter();
-  };
-
   successMessage.addEventListener('click', function () {
     successMessage.classList.add('hidden');
   });
 
   formResetButton.addEventListener('click', function (evt) {
     evt.preventDefault();
-    resetPage();
+    window.util.resetPage();
   });
 
   var formSuccessSentHandler = function () {
-    resetPage();
+    window.util.resetPage();
     successMessage.classList.remove('hidden');
   };
 

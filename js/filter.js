@@ -28,7 +28,7 @@
     return -1;
   };
 
-  var editFeature = function (feature) {
+  var editFeatureList = function (feature) {
     var existing = findIndex(FilterState['features'], feature.value);
     if (feature.checked) {
       FilterState['features'].push(feature.value);
@@ -65,7 +65,7 @@
 
   var checkFeature = function (given, filter) {
     var count = 0;
-    if (filter.length) {
+    if (filter.length && given.length) {
       for (var i = 0; i < filter.length; i++) {
         for (var j = 0; j < given.length; j++) {
           if (checkSame(filter[i], given[j])) {
@@ -120,16 +120,13 @@
 
   var filterChangeHandler = function (evt) {
     if (evt.target.name === 'features') {
-      editFeature(evt.target);
+      editFeatureList(evt.target);
     } else {
       FilterState[evt.target.name] = evt.target.value;
     }
-
-    if (window.util.cardPopup) {
-      window.util.cardPopup.remove();
-    }
+    window.util.removeCardPopup();
     window.util.removePins();
-    var itemList = findSuitable(window.data.serverData, FilterState);
+    var itemList = findSuitable(window.data.getData(), FilterState);
     window.util.appendMapPins(itemList);
   };
 

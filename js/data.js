@@ -38,9 +38,9 @@
   };
 
   var shuffledTitles = window.util.generateShuffledArray(TITLES);
-  var shuffledAvatarNumbers = window.util.generateShuffledIntArray(8);
+  var shuffledAvatarNumbers = window.util.generateShuffledIntArray(8, true);
 
-  var generateCardObjectList = function (amount) {
+  var generateCardObjectList = function (amount, callback) {
     var cardList = [];
     for (var i = 0; i < amount; i++) {
       var card = {};
@@ -63,6 +63,9 @@
       card.offer.photos = window.util.generateShuffledArray(PHOTOS);
       cardList.push(card);
     }
+    if (callback) {
+      callback(cardList);
+    }
     return cardList;
   };
   var showError = function (err) {
@@ -76,13 +79,35 @@
     document.querySelector('main').appendChild(errorMessage);
   };
 
-  var writeResponseData = function (res) {
-    window.data.serverData = res;
-  };
-  window.backend.load('https://js.dump.academy/keksobooking/data', writeResponseData, showError);
-
-  window.data = {
-    generateData: generateCardObjectList,
-    serverData: null
-  };
+  window.data = (function () {
+    var _fromServer = true; // true = с сервера; false = сгенерированная
+    var _generateData = null;
+    var _serverData = null;
+    var _writeData = function (list) {
+      if (_fromServer) {
+        _serverData = list;
+      } else {
+        _generateData = list;
+      }
+      window.util.appendMapPins(window.data.getData());
+    };
+    return {
+      loadData: function () {
+        if (_fromServer) {
+          window.backend.load('https://js.dump.academy/keksobooking/data', _writeData, showError);
+        } else {
+          generateCardObjectList(8, _writeData);
+        }
+      },
+      getData: function () {
+        if (_fromServer) {
+          return _serverData;
+        }
+        return _generateData;
+      },
+      setLoadFromServer: function (fromServer) {
+        _fromServer = fromServer;
+      }
+    };
+  })();
 })();

@@ -83,16 +83,15 @@
     cardNode.querySelector('img').src = item.author.avatar;
   };
 
-  function isEscPressEvent(evt, callback) {
+  var isEscPressEvent = function (evt, callback) {
     if (evt.keyCode === ESC_CODE) {
       callback();
     }
-  }
+  };
 
-  var cardEscPressHandler = function (evt) {
+  window.cardEscPressHandler = function (evt) {
     isEscPressEvent(evt, function () {
-      window.util.cardPopup.remove();
-      document.removeEventListener('keydown', cardEscPressHandler);
+      window.util.removeCardPopup();
     });
   };
 
@@ -110,9 +109,9 @@
     setCardPhotos(cardElement, item);
     setCardAvatar(cardElement, item);
     closeButton.addEventListener('click', function () {
-      cardElement.remove();
+      window.util.removeCardPopup();
     });
-    document.addEventListener('keydown', cardEscPressHandler);
+    document.addEventListener('keydown', window.cardEscPressHandler);
     return cardElement;
   };
 })();

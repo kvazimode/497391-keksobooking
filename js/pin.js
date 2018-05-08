@@ -2,22 +2,20 @@
 
 (function () {
   var findCard = function (alt) {
-    var card = {};
-    for (var i = 0; i < window.data.serverData.length; i++) {
-      if (window.data.serverData[i].offer.title === alt) {
-        card = window.data.serverData[i];
+    var data = window.data.getData();
+    for (var i = 0; i < data.length; i++) {
+      if (data[i].offer.title === alt) {
+        return data[i];
       }
     }
-    return card;
+    return null;
   };
   var pinTemplate = window.util.template.querySelector('.map__pin');
   var pinClickHandler = function (evt) {
     var clickedPin = evt.currentTarget;
     var pinAlt = clickedPin.firstElementChild.alt;
     var card = findCard(pinAlt);
-    if (window.util.cardPopup) {
-      window.util.cardPopup.remove();
-    }
+    window.util.removeCardPopup();
     window.appendCardElement(card);
   };
   window.makePinElement = function (item) {
