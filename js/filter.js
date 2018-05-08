@@ -3,7 +3,7 @@
 
 (function () {
   var DELAY = 500;
-  var filterState = {
+  var FilterState = {
     'housing-type': 'any',
     'housing-price': 'any',
     'housing-rooms': 'any',
@@ -12,7 +12,7 @@
   };
 
   window.resetFilter = function () {
-    filterState.features = [];
+    FilterState.features = [];
     window.util.filterNode.querySelector('form').reset();
   };
 
@@ -29,11 +29,11 @@
   };
 
   var editFeature = function (feature) {
-    var existing = findIndex(filterState['features'], feature.value);
+    var existing = findIndex(FilterState['features'], feature.value);
     if (feature.checked) {
-      filterState['features'].push(feature.value);
+      FilterState['features'].push(feature.value);
     } else {
-      filterState['features'].splice(existing, 1);
+      FilterState['features'].splice(existing, 1);
     }
   };
 
@@ -122,15 +122,15 @@
     if (evt.target.name === 'features') {
       editFeature(evt.target);
     } else {
-      filterState[evt.target.name] = evt.target.value;
+      FilterState[evt.target.name] = evt.target.value;
     }
-    window.cardPopup = window.util.mapNode.querySelector('.popup');
-    if (window.cardPopup) {
-      window.cardPopup.remove();
+
+    if (window.util.cardPopup) {
+      window.util.cardPopup.remove();
     }
     window.util.removePins();
-    var List = findSuitable(window.data.serverData, filterState);
-    window.util.appendMapPins(List);
+    var itemList = findSuitable(window.data.serverData, FilterState);
+    window.util.appendMapPins(itemList);
   };
 
   window.util.filterNode.addEventListener('change', debounce(filterChangeHandler));
